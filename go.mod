@@ -1,3 +1,3 @@
 module github.com/AetheWu/matcher
 
-go 1.23.4
+go 1.23.0
