@@ -15,7 +15,20 @@ func newMqttMatcherDemo() Matcher[struct{}] {
 	matcher.AddPath("iot/bms/things/+/up/service")
 	matcher.AddPath("iot/bms/things/+/up/ota/+")
 	matcher.AddPath("iot/bms/things/+/up/event")
+	matcher.AddPath("iot/ems")
+	matcher.AddPath("iot/ams")
+	matcher.AddPath("iot/ems/things")
+	matcher.AddPath("iot/ems/things/#")
+	matcher.AddPath("iotx")
 	return matcher
+}
+
+func Test_delete(t *testing.T) {
+	matcher := newMqttMatcherDemo()
+	matcher.Delete("iot/bms/things/+/up/event")
+	matcher.Delete("iot/ems/things/#")
+	matcher.PrintTree()
+	t.Log(matcher)
 }
 
 func newNatsMatcherDemo() Matcher[struct{}] {

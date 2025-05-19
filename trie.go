@@ -2,6 +2,7 @@ package matcher
 
 import (
 	"sort"
+	"slices"
 )
 
 type priorities[T any] []*pathTrieNode[T]
@@ -159,4 +160,22 @@ func (t *pathTrieNode[T]) backtraceAll(node *pathTrieNode[T], subs []string, par
 			continue
 		}
 	}
+}
+
+func (t *pathTrieNode[T]) delete(subs []string, index int) bool {
+	if index == len(subs) {
+		// 清除当前节点的值或标记
+		t.values = nil
+		return len(t.arrayChilds) == 0 // 返回是否可被剪枝
+	}
+	for i, subNode := range t.arrayChilds {
+		if subNode.subPath == subs[index] {
+			if subNode.delete(subs, index+1) {
+				// 移除子节点
+				t.arrayChilds = slices.Delete(t.arrayChilds, i, i+1)
+			}
+			break
+		}
+	}
+	return len(t.arrayChilds) == 0 && t.values == nil
 }

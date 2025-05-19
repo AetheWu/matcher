@@ -2,6 +2,7 @@ package matcher
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -207,4 +208,42 @@ func (t *Matcher[T]) MatchWithAnonymousParamsAndValues(dstTopic string) (matched
 		return "", nil, nil, false
 	}
 	return t.root.matchWithAnonymousParamsByTail(subs)
+}
+
+func (t *Matcher[T]) Delete(path string) {
+	subs, err := t.split(path)
+	if err != nil {
+		return
+	}
+	t.root.delete(subs, 0)
+}
+
+func (m *Matcher[T]) PrintTree() {
+	fmt.Println("Prefix Trie Structure:")
+	m.printNode(m.root, 0)
+}
+
+func (m *Matcher[T]) printNode(node *pathTrieNode[T], depth int) {
+	// 缩进格式
+	prefix := strings.Repeat("  ", depth)
+	// 构建标志描述
+	flags := ""
+	if node.paramFlag {
+		flags += "[Param]"
+	}
+	if node.wildFlag {
+		flags += "[Wildcard]"
+	}
+	if node.wordFlag {
+		flags += "[End]"
+	}
+	// 打印节点信息
+	fmt.Printf(
+		"%s- %s: fullPath=%q, flags=%s, priority=%d, values=%d\n",
+		prefix, node.subPath, node.fullPath, flags, node.priority, len(node.values),
+	)
+	// 递归打印子节点（按优先级排序）
+	for _, child := range sortArrayNodes(node.arrayChilds) {
+		m.printNode(child, depth+1)
+	}
 }
